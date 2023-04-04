@@ -17,12 +17,17 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
+import java.net.SocketException;
+import java.net.UnknownHostException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.sound.sampled.*;
 
 public class menu_principal extends JDialog {
 
 	private final JPanel contentPanel = new JPanel();
+        private Services s = new Services();
 
 	/**
 	 * Launch the application.
@@ -43,8 +48,8 @@ public class menu_principal extends JDialog {
 	/**
 	 * Create the dialog.
 	 */
-	public menu_principal() {
-		String ip_adress = "XXX.XXX.X.XX";
+	public menu_principal() throws UnknownHostException {
+		String ip_adress = s.getLocalIP();
 		JTextField IP = new javax.swing.JTextField();
 		
 		setResizable(false);//TRAVA O TAMANHO DA JANELA
@@ -233,14 +238,24 @@ public class menu_principal extends JDialog {
 						}//fim do IF
 						
 						else if(IP.getText() != vazio && IP.getText() != Placeholder){
-							System.out.println("opa");
-							Ludo dialog = new Ludo();//instacia o quadro
-							try {
-								dialog.inicia();
-							} catch (IOException e1) {
-								// TODO Auto-generated catch block
-								e1.printStackTrace();
-							}
+                                                    try {
+                                                        if(s.verificaIP(IP.getText())){
+                                                            System.out.println("opa");
+                                                            Ludo dialog = new Ludo();//instacia o quadro
+                                                            try {
+                                                                dialog.inicia();
+                                                            } catch (IOException e1) {
+                                                                // TODO Auto-generated catch block
+                                                                e1.printStackTrace();
+                                                            }
+                                                        }else{
+                                                            JOptionPane.showMessageDialog(null, "ERROR 404 - Endereço IP nullo ou inexistente", "IP nulo", JOptionPane.ERROR_MESSAGE);
+                                                            
+                                                        }
+                                                    } catch (SocketException ex) {
+                                                        Logger.getLogger(menu_principal.class.getName()).log(Level.SEVERE, null, ex);
+                                                    }
+							
 						}//fim do IF
 						
 					}//fim do evento de clique 
