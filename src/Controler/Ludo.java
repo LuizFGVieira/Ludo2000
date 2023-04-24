@@ -1,6 +1,5 @@
 package Controler;
 
-import Model.Jogo;
 import view.JanelaPrincipal;
 import java.io.IOException;
 

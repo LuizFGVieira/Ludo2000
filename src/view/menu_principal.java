@@ -240,10 +240,11 @@ public class menu_principal extends JDialog {
 						else if(IP.getText() != vazio && IP.getText() != Placeholder){
                                                     try {
                                                         if(s.verificaIP(IP.getText())){
-                                                            System.out.println("opa");
+                                                            System.out.println("opa");          
                                                             Ludo dialog = new Ludo();//instacia o quadro
                                                             try {
                                                                 dialog.inicia();
+                                                                dispose();
                                                             } catch (IOException e1) {
                                                                 // TODO Auto-generated catch block
                                                                 e1.printStackTrace();

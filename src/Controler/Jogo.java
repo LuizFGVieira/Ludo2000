@@ -1,5 +1,9 @@
-package Model;
+package Controler;
 
+import Model.Casa;
+import Model.Jogador;
+import Model.Peao;
+import Model.Tabuleiro;
 import view.JanelaPrincipal;
 import java.awt.Color;
 import java.awt.event.MouseAdapter;
