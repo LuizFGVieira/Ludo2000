@@ -1,12 +1,13 @@
 package Model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
  *
  * @author luizf
  */
-public class Jogador {
+public class Jogador implements Serializable{
     public int id;
     public String nome;
     public ArrayList<Peao> peao = new ArrayList<>(4);

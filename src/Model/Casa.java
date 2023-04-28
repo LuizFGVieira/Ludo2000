@@ -1,12 +1,13 @@
 package Model;
 
+import java.io.Serializable;
 import java.util.Stack;
 
 /**
  *
  * @author luizf
  */
-public class Casa {
+public class Casa implements Serializable{
     public int x;
     public int y;
     public Stack<Jogador> ocupada;
