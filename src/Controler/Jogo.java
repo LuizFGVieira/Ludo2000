@@ -5,6 +5,7 @@ import Model.Jogador;
 import Model.Mensagem;
 import Model.Peao;
 import Model.Tabuleiro;
+import java.awt.Color;
 import view.JanelaPrincipal;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -80,7 +81,8 @@ public final class Jogo {
             }
         });
         
-        iniciarTurno();
+        //iniciarTurno();
+       
     }
     
     public void setConnection(Connection connection) {
@@ -176,19 +178,36 @@ public final class Jogo {
         
         if(msg.peaoMovido != null){
             if(isHost){
-                
+                jogador2.caminho.get(jogador2.peao.get(msg.peaoMovido.id).casa).ocupada.pop(); 
                 this.jogador2.peao.get(msg.peaoMovido.id).saiu = msg.peaoMovido.saiu;
                 this.jogador2.peao.get(msg.peaoMovido.id).casa = msg.peaoMovido.casa;
+                jogador2.caminho.get(jogador2.peao.get(msg.peaoMovido.id).casa).ocupada.push(jogador2);
 
             }else{
-
+                jogador1.caminho.get(jogador1.peao.get(msg.peaoMovido.id).casa).ocupada.pop();
                 this.jogador1.peao.get(msg.peaoMovido.id).saiu = msg.peaoMovido.saiu;
                 this.jogador1.peao.get(msg.peaoMovido.id).casa = msg.peaoMovido.casa;
+                jogador1.caminho.get(jogador1.peao.get(msg.peaoMovido.id).casa).ocupada.push(jogador1);
 
                 janela.setPeaoPosition(jogador1.peao.get(msg.peaoMovido.id), jogador1);
             }
   
             janela.registroLog.setText(janela.registroLog.getText()+"\n   - Peao movido: "+ msg.peaoMovido.id);
+        }
+        
+        if(msg.peaoCapturado != null){
+            if(isHost){
+                jogador1.caminho.get(jogador1.peao.get(msg.peaoCapturado.id).casa).ocupada.pop();
+                jogador1.peao.get(msg.peaoCapturado.id).casa = msg.peaoCapturado.casa;
+                jogador1.peao.get(msg.peaoCapturado.id).saiu = msg.peaoCapturado.saiu;
+                jogador1.caminho.get(jogador1.peao.get(msg.peaoMovido.id).casa).ocupada.push(jogador1);
+            }else{
+                jogador2.caminho.get(jogador2.peao.get(msg.peaoCapturado.id).casa).ocupada.pop();
+                jogador2.peao.get(msg.peaoCapturado.id).casa = msg.peaoCapturado.casa;
+                jogador2.peao.get(msg.peaoCapturado.id).saiu = msg.peaoCapturado.saiu;
+                jogador2.caminho.get(jogador2.peao.get(msg.peaoMovido.id).casa).ocupada.push(jogador2);
+            }
+            janela.registroLog.setText(janela.registroLog.getText()+"\n   - Peao do Oponente volta ao inicio");
         }
         
         
@@ -211,15 +230,32 @@ public final class Jogo {
         for(int i = 0; i < 4; i++){
             janela.setPeaoPosition(jogador2.peao.get(i), jogador2);
         }
+        
+        if(isHost){
+            janela.turn.setForeground(Color.red);
+        }else{
+            janela.turn.setForeground(Color.GREEN);
+        }
+        janela.turn.setText("Seu Turno!");
     }
     
     public void passarVez(){
         
         if(isHost){
+            for(int i = 0; i < 4; i++){
+                jogador1.peao.get(i).setIcon(janela.imgPeao.get(0));
+            }
             janela.registroLog.setText(janela.registroLog.getText()+"\n\n+ Jogador 2");
+            
+            janela.turn.setForeground(Color.GREEN);
         }else{
+            for(int i = 0; i < 4; i++){  
+                jogador2.peao.get(i).setIcon(janela.imgPeao.get(2));
+            }
             janela.registroLog.setText(janela.registroLog.getText()+"\n\n+ Jogador 1");
+            janela.turn.setForeground(Color.red);
         }
+        janela.turn.setText("Turno do Oponente");
          
         msg.valDado = this.valDado;
         connection.enviarJogada(this.msg);
@@ -260,6 +296,16 @@ public final class Jogo {
         janela.registroLog.setText(janela.registroLog.getText()+"\n   - Dado rolado: "+valDado);
         
         this.fase = 1;
+        
+        if(isHost){
+            for(int i = 0; i < 4; i++){
+                jogador1.peao.get(i).setIcon(janela.imgPeao.get(1));
+            }
+        }else{
+            for(int i = 0; i < 4; i++){
+                jogador2.peao.get(i).setIcon(janela.imgPeao.get(3));
+            }
+        }
         /*if(valDado != 6){
             boolean peaoSolto = false;
             for(int i = 0; i<4; i++){
@@ -274,44 +320,145 @@ public final class Jogo {
         }*/
     }
     
-    public int checarCasa(int casa){
-        Jogador vez;
-        if(isHost){
-            vez = jogador1;
-        }else{
-            vez = jogador2;
-        }
+    public boolean checarCasa(int casa, Jogador jogador){
         
-        if(vez.caminho.get(casa).ocupada.peek() != vez && vez.caminho.get(casa).ocupada.size() == 1){
-            if(vez.id == 1){
-                for(Peao peao: jogador2.peao){
-                    if(jogador2.caminho.get(peao.casa) == vez.caminho.get(casa)){
-                        jogador2.caminho.get(peao.casa).ocupada.pop();
-                        voltarInicio(peao, jogador2.caminho, jogador2);
-                        janela.setPeaoPosition(peao,jogador2);
+        if(isHost){
+            
+            /*
+            *   Caso 1: Casa ocupada pelo próprio jogador
+            */
+            if(jogador.caminho.get(casa).ocupada.peek() == jogador1){return true;}
+            
+            /*
+            *   Caso 2: Casa ocupada por um peão do oponente
+            */
+            else if(jogador.caminho.get(casa).ocupada.size() == 1){
+                for(int i = 0; i < 4; i++){
+                    if(jogador.caminho.get(casa) == jogador2.caminho.get(jogador2.peao.get(i).casa)){
+                        voltarInicio(jogador2.peao.get(i), jogador2.caminho, jogador2);
+                        janela.setPeaoPosition(jogador2.peao.get(i), jogador2);
+                        this.msg.peaoCapturado = jogador2.peao.get(i);
+                        janela.registroLog.setText(janela.registroLog.getText()+"\n   - Peao do oponente volta ao início");
                     }
                 }
-            }else{
-                for(Peao peao: jogador1.peao){
-                    if(jogador1.caminho.get(peao.casa) == vez.caminho.get(casa)){
-                        jogador1.caminho.get(peao.casa).ocupada.pop();
-                        voltarInicio(peao, jogador1.caminho, jogador1);
-                        janela.setPeaoPosition(peao,jogador1);
-                    }
-                }
+                return true;
             }
-            janela.registroLog.setText(janela.registroLog.getText()+"\n   - Peao do Oponente volta ao inicio");
-            return 1;
-        }else if(vez.caminho.get(casa).ocupada.peek() == vez){
-            return 1;
+            
+            /*
+            *   Caso 3: Casa ocupada por mais de um peão do oponente
+            */
+            else{return false;}
+            
         }else{
-            return 0;
+            
+            /*
+            *   Caso 1: Casa ocupada pelo próprio jogador
+            */
+            if(jogador.caminho.get(casa).ocupada.peek() == jogador2){return true;}
+            
+            /*
+            *   Caso 2: Casa ocupada por um peão do oponente
+            */
+            else if(jogador.caminho.get(casa).ocupada.size() == 1){
+                for(int i = 0; i < 4; i++){
+                    if(jogador.caminho.get(casa) == jogador1.caminho.get(jogador1.peao.get(i).casa)){
+                        voltarInicio(jogador1.peao.get(i), jogador1.caminho, jogador1);
+                        janela.setPeaoPosition(jogador1.peao.get(i), jogador1);
+                        this.msg.peaoCapturado = jogador1.peao.get(i);
+                        janela.registroLog.setText(janela.registroLog.getText()+"\n   - Peao do oponente volta ao início");
+                    }
+                }
+                return true;
+            }
+            
+            /*
+            *   Caso 3: Casa ocupada por mais de um peão do oponente
+            */
+            else{return false;}
         }
     }
     
     
     public void mexerPeao(Jogador jogador, Peao peao){
-        Jogador vez;
+        /*
+        *   Caso 1: Peão no início
+        */
+        if(peao.casa < 4 && valDado == 6){
+            
+            /*
+            *   Caso 1.1: Primeira casa ocupada
+            */
+            if(!jogador.caminho.get(4).ocupada.isEmpty()){
+                if(checarCasa(4, jogador)){
+                    jogador.caminho.get(peao.casa).ocupada.pop();
+                    peao.saiu = true;
+                    peao.casa = 4;
+                    jogador.caminho.get(peao.casa).ocupada.push(jogador);
+                    this.msg.jogador = jogador;
+                    this.msg.peaoMovido = peao;
+                    janela.setPeaoPosition(peao, jogador);
+                    janela.registroLog.setText(janela.registroLog.getText()+"\n   - Peao movido: "+ peao.id);
+                    passarVez();
+                }
+            }
+            
+            /*
+            *   Caso 1.2: Primeira casa desocupada
+            */
+            else{
+                jogador.caminho.get(peao.casa).ocupada.pop();
+                peao.saiu = true;
+                peao.casa = 4;
+                jogador.caminho.get(peao.casa).ocupada.push(jogador);
+                this.msg.jogador = jogador;
+                this.msg.peaoMovido = peao;
+                janela.setPeaoPosition(peao, jogador);
+                janela.registroLog.setText(janela.registroLog.getText()+"\n   - Peao movido: "+ peao.id);
+                passarVez();
+            }
+            
+        }
+        
+        /*
+        *   Caso 2: Peão já está em jogo
+        */
+        else if(peao.saiu){
+            jogador.caminho.get(peao.casa).ocupada.pop();
+            peao.casa += valDado;
+            /*
+            *   Caso 2.1: Casa ocupada
+            */
+            if(!jogador.caminho.get(peao.casa).ocupada.isEmpty()){
+                
+                if(checarCasa(peao.casa, jogador)){
+                    jogador.caminho.get(peao.casa).ocupada.push(jogador);
+                    this.msg.jogador = jogador;
+                    this.msg.peaoMovido = peao;
+                    janela.setPeaoPosition(peao, jogador);
+                    janela.registroLog.setText(janela.registroLog.getText()+"\n   - Peao movido: "+ peao.id);
+                    passarVez();
+                }else{
+                    peao.casa -= valDado;
+                    jogador.caminho.get(peao.casa).ocupada.push(jogador);
+                }
+            }
+            
+            /*
+            *   Caso 2.2: Casa desocupada
+            */
+            else{
+                jogador.caminho.get(peao.casa).ocupada.push(jogador);
+                this.msg.jogador = jogador;
+                this.msg.peaoMovido = peao;
+                janela.setPeaoPosition(peao, jogador);
+                janela.registroLog.setText(janela.registroLog.getText()+"\n   - Peao movido: "+ peao.id);
+                passarVez();
+            }
+        }
+        
+        
+        
+        /*Jogador vez;
         if(isHost){
             vez = jogador1;
         }else{
@@ -381,7 +528,7 @@ public final class Jogo {
         }else if(valDado != 6){
             JOptionPane.showMessageDialog(null,"Você tem que rolar 6 para mexer este peão!","Regras",0);
             return;
-        }
+        }*/
           
     }
     
@@ -392,6 +539,13 @@ public final class Jogo {
 
     public void setIsHost(boolean isHost) {
         this.isHost = isHost;
+        if(isHost){
+            janela.turn.setForeground(Color.red);
+            janela.turn.setText("Seu Turno!");
+        }else{
+            janela.turn.setForeground(Color.GREEN);
+            janela.turn.setText("Turno do Oponente");
+        }
     } 
 
     public void setValDado(int valDado) {

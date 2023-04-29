@@ -20,7 +20,6 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -40,6 +39,7 @@ public class JanelaPrincipal extends JFrame{
     public JPanel previsao;
     public ArrayList<JLabel> marcador = new ArrayList<>();
     public JButton passaVez;
+    public JLabel turn;
     
     public JanelaPrincipal() throws IOException{
         
@@ -99,15 +99,24 @@ public class JanelaPrincipal extends JFrame{
         regras.addMouseListener(new MouseAdapter(){
             @Override
             public void mouseClicked(MouseEvent e){
-                JOptionPane.showMessageDialog(null, 
-                        "Resumo\n\n1º: Role o dado no centro do tabuleiro;\n"
-                                + "2º: Caso role 6, pode sair com um peão, caso contrário mova um peão que ja tenha saido\n"
-                                + "3º: Se cair em uma casa ocupada pelo oponente, o peão do oponente volta ao inicio\n\n"
-                                + "Objetivo: Dar a volta no tabuleiro com seus quatro peões",
+                JOptionPane.showMessageDialog(null, """
+                                                    Resumo
+                                                    
+                                                    1\u00ba: Role o dado no centro do tabuleiro;
+                                                    2\u00ba: Caso role 6, pode sair com um pe\u00e3o, caso contr\u00e1rio mova um pe\u00e3o que ja tenha saido
+                                                    3\u00ba: Se cair em uma casa ocupada pelo oponente, o pe\u00e3o do oponente volta ao inicio
+                                                    
+                                                    Objetivo: Dar a volta no tabuleiro com seus quatro pe\u00f5es""",
                         "Regras", 
                         WIDTH);
             }      
         });
+        
+        
+        turn = new JLabel();
+        turn.setFont(new Font("Sans-Serif", Font.PLAIN, 22));
+        turn.setBounds(615, 5, 300, 50);
+        add(turn);
     }
     
     public void setMarcador(Casa casa){
@@ -138,7 +147,7 @@ public class JanelaPrincipal extends JFrame{
     }
     
     private void criaIcones(){
-        BufferedImage img = null;
+        BufferedImage img;
         
         try {
             img = ImageIO.read(new File("Files/dado1.png"));   
@@ -164,7 +173,6 @@ public class JanelaPrincipal extends JFrame{
             img = ImageIO.read(new File("Files/peaoVerdeFocus.png"));   
             imgPeao.add(new ImageIcon(img));
         } catch (IOException e) {
-            e.printStackTrace();
         }
     }
     
@@ -193,7 +201,6 @@ public class JanelaPrincipal extends JFrame{
         try {
             img = ImageIO.read(new File("Files/tabuleiro.jpg"));
         } catch (IOException e) {
-            e.printStackTrace();
         }
         
         ImageIcon imageIcon = new ImageIcon(img);

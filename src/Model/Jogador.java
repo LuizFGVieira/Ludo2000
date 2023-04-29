@@ -7,7 +7,7 @@ import java.util.ArrayList;
  *
  * @author luizf
  */
-public class Jogador implements Serializable{
+public final class Jogador implements Serializable{
     public int id;
     public String nome;
     public ArrayList<Peao> peao = new ArrayList<>(4);
