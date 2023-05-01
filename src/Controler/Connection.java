@@ -20,7 +20,7 @@ import javax.swing.JOptionPane;
  */
 public class Connection implements Runnable{
     public boolean myTurn;
-    private Socket socket;
+    public Socket socket;
     private ServerSocket serverSocket;
     private final int port = 5000;
     private InetAddress ip;
@@ -53,9 +53,15 @@ public class Connection implements Runnable{
             String outputLine = "Ola, bem-vindo ao servidor!";
             out.println(outputLine);
             this.serverSocket.close();
-            
         } catch (IOException e) {
             JOptionPane.showMessageDialog(null, "Falha na conexão!");
+        }
+    }
+    
+    public void disconect(){
+        try {
+            this.serverSocket.close();
+        } catch (IOException e) {
         }
     }
     

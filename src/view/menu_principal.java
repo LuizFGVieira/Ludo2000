@@ -270,8 +270,7 @@ public class menu_principal extends JDialog {
                                 con.setIp(InetAddress.getByName(IP.getText()));
                                 con.connect();
 
-                                jogo.setConnection(con);                                                              
-
+                                jogo.setConnection(con);                                                                 
                                 dispose();
                             } catch (IOException e1) {
                                 // TODO Auto-generated catch block

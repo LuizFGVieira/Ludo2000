@@ -32,6 +32,8 @@ import javax.swing.JTextArea;
 public class JanelaPrincipal extends JFrame{
     private final ArrayList<ImageIcon> imgDado = new ArrayList<>(7);
     public final ArrayList<ImageIcon> imgPeao = new ArrayList<>(4);
+    public final ArrayList<ImageIcon> imgPeaoVerdeJunto = new ArrayList<>();
+    public final ArrayList<ImageIcon> imgPeaoVermelhoJunto = new ArrayList<>();
     public final JLabel dado;
     public JPanel registro;
     public JPanel jogo;
@@ -69,7 +71,7 @@ public class JanelaPrincipal extends JFrame{
         registroLog.setFont(new Font("Sans-Serif", Font.PLAIN, 16));
         registroLog.setLineWrap(true);
         
-        passaVez = new JButton("Passar a Vez");
+        passaVez = new JButton("Desistir");
         passaVez.setMargin(new Insets(15,100,15,100)); 
         
         JScrollPane scrollPane = new JScrollPane(registroLog);
@@ -86,10 +88,6 @@ public class JanelaPrincipal extends JFrame{
         
         JMenuBar menuBar = new JMenuBar();
         setJMenuBar(menuBar);      
-        
-        JMenu recomeco = new JMenu();
-        recomeco.setText("Recomeçar");
-        menuBar.add(recomeco);
         
         JMenu regras = new JMenu();
         regras.setText("Regras");  
@@ -172,6 +170,19 @@ public class JanelaPrincipal extends JFrame{
             imgPeao.add(new ImageIcon(img));
             img = ImageIO.read(new File("Files/peaoVerdeFocus.png"));   
             imgPeao.add(new ImageIcon(img));
+            img = ImageIO.read(new File("Files/peaoVerde2.png"));   
+            imgPeaoVerdeJunto.add(new ImageIcon(img));
+            img = ImageIO.read(new File("Files/peaoVerde3.png"));   
+            imgPeaoVerdeJunto.add(new ImageIcon(img));
+            img = ImageIO.read(new File("Files/peaoVerde4.png"));   
+            imgPeaoVerdeJunto.add(new ImageIcon(img));
+            img = ImageIO.read(new File("Files/peaoVermelho2.png"));   
+            imgPeaoVermelhoJunto.add(new ImageIcon(img));
+            img = ImageIO.read(new File("Files/peaoVermelho3.png"));   
+            imgPeaoVermelhoJunto.add(new ImageIcon(img));
+            img = ImageIO.read(new File("Files/peaoVermelho4.png"));   
+            imgPeaoVermelhoJunto.add(new ImageIcon(img));
+            
         } catch (IOException e) {
         }
     }
